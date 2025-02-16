@@ -2,7 +2,7 @@ defmodule TbjToPocketWeb.Router do
   use TbjToPocketWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json", "multipart"]
+    plug :accepts, ["multipart"]
   end
 
   pipeline :authenticated do
@@ -10,7 +10,7 @@ defmodule TbjToPocketWeb.Router do
   end
 
   scope "/api", TbjToPocketWeb do
-    pipe_through [:api, :authenticated]
+    # pipe_through [:api, :authenticated]
 
     post "/articles", Controller, :new
   end
