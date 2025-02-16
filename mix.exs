@@ -37,7 +37,9 @@ defmodule TbjToPocket.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, ">= 0.0.0"}
+      {:bandit, ">= 0.0.0"},
+      {:cubdb, "~> 2.0.2"},
+      {:req, "~> 0.5.8"}
     ]
   end
 

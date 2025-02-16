@@ -8,6 +8,7 @@ defmodule TbjToPocket.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {CubDB, name: :cubdb, data_dir: "./data", auto_compact: true},
       TbjToPocketWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},
