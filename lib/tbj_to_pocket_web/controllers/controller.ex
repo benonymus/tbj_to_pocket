@@ -12,7 +12,7 @@ defmodule TbjToPocketWeb.Controller do
          id = Nanoid.generate(),
          :ok <- CubDB.put(:cubdb, id, binary),
          {:ok, %{status: 200}} <- send_url_to_pocket(id) do
-      send_resp(conn, :ok, Jason.encode!(%{success: true}))
+      send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
       error ->
         Logger.error("Failed to send url to Pocket: #{inspect(error)}")
@@ -23,11 +23,15 @@ defmodule TbjToPocketWeb.Controller do
   defp send_url_to_pocket(id) do
     consumer_key = Application.fetch_env!(:tbj_to_pocket, :pocket_consumer_key)
     access_token = Application.fetch_env!(:tbj_to_pocket, :pocket_access_token)
-    article_url = "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"
+    url = "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"
 
     Req.post("https://getpocket.com/v3/add",
       retry: :transient,
-      json: %{consumer_key: consumer_key, access_token: access_token, article_url: article_url}
+      json: %{
+        consumer_key: consumer_key,
+        access_token: access_token,
+        url: url
+      }
     )
   end
 end
