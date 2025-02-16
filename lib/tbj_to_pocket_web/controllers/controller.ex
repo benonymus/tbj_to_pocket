@@ -27,6 +27,7 @@ defmodule TbjToPocketWeb.Controller do
 
     Req.post("https://getpocket.com/v3/add",
       retry: :transient,
+      receive_timeout: 30_000,
       json: %{
         consumer_key: consumer_key,
         access_token: access_token,
