@@ -41,7 +41,8 @@ if config_env() == :prod do
   config :tbj_to_pocket,
     pocket_consumer_key: System.get_env("POCKET_CONSUMER_KEY"),
     pocket_access_token: System.get_env("POCKET_ACCESS_TOKEN"),
-    auth_token: System.get_env("AUTH_TOKEN")
+    auth_token: System.get_env("AUTH_TOKEN"),
+    max_article_count: System.get_env("MAX_ARTICLE_COUNT")
 
   config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],

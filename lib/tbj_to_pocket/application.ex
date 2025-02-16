@@ -5,10 +5,13 @@ defmodule TbjToPocket.Application do
 
   use Application
 
+  require Logger
+
   @impl true
   def start(_type, _args) do
     children = [
       {CubDB, name: :cubdb, data_dir: "./data", auto_compact: true},
+      {Task, fn -> run_cleanup() end},
       TbjToPocketWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},
@@ -30,5 +33,27 @@ defmodule TbjToPocket.Application do
   def config_change(changed, _new, removed) do
     TbjToPocketWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp run_cleanup do
+    max_article_count = Application.fetch_env!(:tbj_to_pocket, :max_article_count)
+    current_article_count = CubDB.size(:cubdb)
+    count_to_delete = current_article_count - max_article_count
+
+    Logger.info("#{current_article_count} articles are stored")
+
+    if count_to_delete > 0 do
+      Logger.info("#{count_to_delete} articles are about to be deleted")
+
+      keys_to_delete =
+        :cubdb
+        |> CubDB.select()
+        |> Stream.map(fn {k, _v} -> k end)
+        |> Enum.take(count_to_delete)
+
+      CubDB.delete_multi(:cubdb, keys_to_delete)
+    else
+      :ok
+    end
   end
 end
