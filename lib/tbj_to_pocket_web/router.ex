@@ -2,7 +2,7 @@ defmodule TbjToPocketWeb.Router do
   use TbjToPocketWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json", "multipart"]
   end
 
   pipeline :authenticated do
