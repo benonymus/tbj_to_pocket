@@ -10,13 +10,12 @@ defmodule TbjToPocketWeb.Router do
   end
 
   scope "/api", TbjToPocketWeb do
-    # pipe_through [:api]
-    # pipe_through [:api, :authenticated]
+    pipe_through [:api, :authenticated]
 
     post "/articles", Controller, :new
   end
 
-  scope "/", TbjToPocketWeb do
-    get "/articles/:id", Controller, :show
+  scope "/articles", TbjToPocketWeb do
+    get "/:id", Controller, :show
   end
 end

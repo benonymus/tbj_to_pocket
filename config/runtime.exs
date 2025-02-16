@@ -38,6 +38,11 @@ if config_env() == :prod do
 
   config :tbj_to_pocket, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
+  config :tbj_to_pocket,
+    pocket_consumer_key: System.get_env("POCKET_CONSUMER_KEY"),
+    pocket_access_token: System.get_env("POCKET_ACCESS_TOKEN"),
+    auth_token: System.get_env("AUTH_TOKEN")
+
   config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
