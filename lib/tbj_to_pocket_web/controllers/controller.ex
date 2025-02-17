@@ -4,12 +4,28 @@ defmodule TbjToPocketWeb.Controller do
   require Logger
 
   def show(conn, %{"id" => id}) do
-    send_resp(conn, :ok, CubDB.get(:cubdb, id, "no content"))
+    conn
+    |> put_resp_header("content-type", "text/html; charset=UTF-8")
+    |> send_resp(:ok, CubDB.get(:cubdb, id, "no content"))
   end
 
+  # handles webhooks from file uploads eg.: https://github.com/gildas-lormeau/SingleFile
   def new(conn, %{"data" => data}) do
     with {:ok, binary} <- File.read(data.path),
          id = Nanoid.generate(),
+         :ok <- CubDB.put(:cubdb, id, binary),
+         {:ok, %{status: 200}} <- send_url_to_pocket(id) do
+      send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
+    else
+      error ->
+        Logger.error("Failed to send url to Pocket: #{inspect(error)}")
+        send_resp(conn, 400, Jason.encode!(%{success: false}))
+    end
+  end
+
+  # handles webhooks where content is in the request body directly
+  def new(conn, %{"payload" => %{"body-html" => binary}}) do
+    with id = Nanoid.generate(),
          :ok <- CubDB.put(:cubdb, id, binary),
          {:ok, %{status: 200}} <- send_url_to_pocket(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
