@@ -12,7 +12,7 @@ defmodule TbjToPocketWeb.ProxiedAuth do
 
   def call(conn, _opts) do
     expected_origin = Application.fetch_env!(:tbj_to_pocket, :expected_origin)
-    origin = conn.params["user"]["username"]
+    [%{"address" => origin}] = conn.params["from"]
 
     if expected_origin == origin do
       conn

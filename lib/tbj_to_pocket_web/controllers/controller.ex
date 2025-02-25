@@ -24,7 +24,7 @@ defmodule TbjToPocketWeb.Controller do
   end
 
   # handles webhooks where content is in the request body directly
-  def new(conn, %{"payload" => %{"body-html" => binary}}) do
+  def new(conn, %{"html" => binary}) do
     with id = Nanoid.generate(),
          :ok <- CubDB.put(:cubdb, id, binary),
          {:ok, %{status: 200}} <- send_url_to_pocket(id) do
