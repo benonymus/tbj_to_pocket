@@ -14,11 +14,12 @@ defmodule TbjToPocketWeb.ProxiedAuth do
     expected_origin = Application.fetch_env!(:tbj_to_pocket, :expected_origin)
     [%{"address" => origin}] = conn.params["from"]
 
-    if expected_origin == origin do
+    if origin =~ expected_origin do
       conn
     else
       conn
-      |> put_status(:unauthorized)
+      |> resp(:unauthorized, "failed origin check")
+      |> send_resp()
       |> halt()
     end
   end
