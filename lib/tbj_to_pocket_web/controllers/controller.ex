@@ -4,16 +4,22 @@ defmodule TbjToPocketWeb.Controller do
   require Logger
 
   def show(conn, %{"id" => id}) do
-    conn
-    |> put_resp_header("content-type", "text/html; charset=UTF-8")
-    |> send_resp(:ok, CubDB.get(:cubdb, id, "no content"))
+    case Cachex.get(:articles, id) do
+      {:ok, nil} ->
+        send_resp(conn, 404, "not found")
+
+      {:ok, article} ->
+        conn
+        |> put_resp_header("content-type", "text/html; charset=UTF-8")
+        |> send_resp(:ok, article)
+    end
   end
 
   # handles webhooks from file uploads eg.: https://github.com/gildas-lormeau/SingleFile
   def new(conn, %{"data" => data}) do
     with {:ok, binary} <- File.read(data.path),
          id = Nanoid.generate(),
-         :ok <- CubDB.put(:cubdb, id, binary),
+         {:ok, true} <- Cachex.put(:articles, id, binary),
          {:ok, %{status: 200}} <- send_url_to_pocket(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
@@ -26,7 +32,7 @@ defmodule TbjToPocketWeb.Controller do
   # handles webhooks where content is in the request body directly
   def new(conn, %{"html" => binary}) do
     with id = Nanoid.generate(),
-         :ok <- CubDB.put(:cubdb, id, binary),
+         {:ok, true} <- Cachex.put(:articles, id, binary),
          {:ok, %{status: 200}} <- send_url_to_pocket(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else

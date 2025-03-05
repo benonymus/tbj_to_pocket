@@ -27,6 +27,3 @@ tbj_to_pocket-*.tar
 
 # Ignore secret config files
 /config/*.secret.exs
-
-# ignore cubdb data
-/data/

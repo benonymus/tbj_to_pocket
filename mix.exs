@@ -38,7 +38,7 @@ defmodule TbjToPocket.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, ">= 0.0.0"},
-      {:cubdb, "~> 2.0.2"},
+      {:cachex, "~> 4.0"},
       {:req, "~> 0.5.8"},
       {:nanoid, "~> 2.1.0"}
     ]
