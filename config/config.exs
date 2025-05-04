@@ -7,9 +7,7 @@
 # General application configuration
 import Config
 
-config :tbj_to_pocket,
-  generators: [timestamp_type: :utc_datetime],
-  max_article_count: 10
+config :tbj_to_pocket, generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
 config :tbj_to_pocket, TbjToPocketWeb.Endpoint,

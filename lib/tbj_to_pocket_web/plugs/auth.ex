@@ -7,15 +7,29 @@ defmodule TbjToPocketWeb.Auth do
   end
 
   def call(conn, _opts) do
-    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
-         auth_token = Application.fetch_env!(:tbj_to_pocket, :auth_token),
-         true <- token == auth_token do
-      conn
-    else
+    conn
+    |> get_req_header("authorization")
+    |> auth()
+    |> case do
+      true ->
+        conn
+
       _ ->
         conn
         |> put_status(:unauthorized)
         |> halt()
+    end
+  end
+
+  defp auth(["Bearer " <> token]),
+    do: token == Application.fetch_env!(:tbj_to_pocket, :auth_token)
+
+  defp auth(["Basic " <> token]) do
+    with {:ok, userpass} <- Base.decode64(token),
+         userpass == Application.fetch_env!(:tbj_to_pocket, :userpass) do
+      true
+    else
+      _ -> false
     end
   end
 end
