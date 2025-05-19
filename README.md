@@ -1,5 +1,7 @@
 # TbjToPocket
 
+Small project that accepts [html](https://github.com/gildas-lormeau/SingleFile) content and forwards it to Pocket.
+
 To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies
