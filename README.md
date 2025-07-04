@@ -1,6 +1,6 @@
 # TbjToPocket
 
-Small project that accepts [html](https://github.com/gildas-lormeau/SingleFile) content and forwards it to Pocket.
+Small project that accepts [html](https://github.com/gildas-lormeau/SingleFile) content and forwards it to Wallabag (previously Pocket).
 
 To start your Phoenix server:
 

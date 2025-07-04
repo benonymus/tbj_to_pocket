@@ -13,4 +13,8 @@ defmodule TbjToPocketWeb.Router do
   scope "/articles", TbjToPocketWeb do
     get "/:id", Controller, :show
   end
+
+  scope "/", TbjToPocketWeb do
+    get "/healthz", Controller, :healthz
+  end
 end

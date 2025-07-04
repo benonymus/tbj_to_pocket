@@ -39,10 +39,12 @@ if config_env() == :prod do
   config :tbj_to_pocket, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :tbj_to_pocket,
-    pocket_consumer_key: System.get_env("POCKET_CONSUMER_KEY"),
-    pocket_access_token: System.get_env("POCKET_ACCESS_TOKEN"),
     auth_token: System.get_env("AUTH_TOKEN"),
-    userpass: System.get_env("USERPASS")
+    userpass: System.get_env("USERPASS"),
+    wallabag_username: System.get_env("WALLABAG_USERNAME"),
+    wallabag_password: System.get_env("WALLABAG_PASSWORD"),
+    wallabag_client_id: System.get_env("WALLABAG_CLIENT_ID"),
+    wallabag_client_secret: System.get_env("WALLABAG_CLIENT_SECRET")
 
   config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
