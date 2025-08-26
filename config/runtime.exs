@@ -40,11 +40,7 @@ if config_env() == :prod do
 
   config :tbj_to_pocket,
     auth_token: System.get_env("AUTH_TOKEN"),
-    userpass: System.get_env("USERPASS"),
-    wallabag_username: System.get_env("WALLABAG_USERNAME"),
-    wallabag_password: System.get_env("WALLABAG_PASSWORD"),
-    wallabag_client_id: System.get_env("WALLABAG_CLIENT_ID"),
-    wallabag_client_secret: System.get_env("WALLABAG_CLIENT_SECRET")
+    userpass: System.get_env("USERPASS")
 
   config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
