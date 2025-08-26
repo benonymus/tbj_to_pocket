@@ -21,7 +21,7 @@ defmodule TbjToPocketWeb.Controller do
     with {:ok, binary} <- File.read(data.path),
          id = Nanoid.generate(),
          {:ok, true} <- Cachex.put(:articles, id, binary),
-         {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
+         {:ok, %{status: 201}} <- send_url_to_instapaper(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
       error ->
@@ -34,7 +34,7 @@ defmodule TbjToPocketWeb.Controller do
   def new(conn, %{"html" => binary}) do
     with id = Nanoid.generate(),
          {:ok, true} <- Cachex.put(:articles, id, binary),
-         {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
+         {:ok, %{status: 201}} <- send_url_to_instapaper(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
       error ->
@@ -48,7 +48,7 @@ defmodule TbjToPocketWeb.Controller do
 
     retry_func = fn _req, resp ->
       case resp do
-        %{status: 200} -> false
+        %{status: 201} -> false
         _ -> true
       end
     end
