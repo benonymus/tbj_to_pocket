@@ -9,7 +9,7 @@ defmodule TbjToPocket.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {Cachex, [:articles, [expiration: expiration(default: :timer.minutes(5))]]},
+      {Cachex, [:articles, [expiration: expiration(default: :timer.minutes(30))]]},
       TbjToPocketWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},
