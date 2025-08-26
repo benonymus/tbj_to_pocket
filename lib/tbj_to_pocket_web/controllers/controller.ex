@@ -21,7 +21,7 @@ defmodule TbjToPocketWeb.Controller do
     with {:ok, binary} <- File.read(data.path),
          id = Nanoid.generate(),
          {:ok, true} <- Cachex.put(:articles, id, binary),
-         {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
+         {:ok, %{status: 200}} <- send_url_to_instapaper(id, binary) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
       error ->
@@ -34,7 +34,7 @@ defmodule TbjToPocketWeb.Controller do
   def new(conn, %{"html" => binary}) do
     with id = Nanoid.generate(),
          {:ok, true} <- Cachex.put(:articles, id, binary),
-         {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
+         {:ok, %{status: 200}} <- send_url_to_instapaper(id, binary) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
       error ->
@@ -43,7 +43,7 @@ defmodule TbjToPocketWeb.Controller do
     end
   end
 
-  defp send_url_to_instapaper(id) do
+  defp send_url_to_instapaper(id, binary) do
     url = "https://www.instapaper.com/api/1/bookmarks/add"
 
     creds =
@@ -59,7 +59,11 @@ defmodule TbjToPocketWeb.Controller do
       OAuther.sign(
         "post",
         url,
-        [{"url", "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"}, {"resolve_final_url", 0}],
+        [
+          {"url", "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"},
+          {"content", binary},
+          {"resolve_final_url", 0}
+        ],
         creds
       )
 
