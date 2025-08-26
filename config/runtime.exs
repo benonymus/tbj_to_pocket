@@ -40,7 +40,10 @@ if config_env() == :prod do
 
   config :tbj_to_pocket,
     auth_token: System.get_env("AUTH_TOKEN"),
-    userpass: System.get_env("USERPASS")
+    consumer_id: System.get_env("CONSUMER_ID"),
+    consumer_secret: System.get_env("CONSUMER_SECRET"),
+    oauth_token: System.get_env("OAUTH_TOKEN"),
+    oauth_secret: System.get_env("OAUTH_SECRET")
 
   config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],

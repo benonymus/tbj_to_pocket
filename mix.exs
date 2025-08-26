@@ -40,7 +40,8 @@ defmodule TbjToPocket.MixProject do
       {:bandit, ">= 0.0.0"},
       {:cachex, "~> 4.0"},
       {:req, "~> 0.5.8"},
-      {:nanoid, "~> 2.1.0"}
+      {:nanoid, "~> 2.1.0"},
+      {:oauther, "~> 1.3"}
     ]
   end
 

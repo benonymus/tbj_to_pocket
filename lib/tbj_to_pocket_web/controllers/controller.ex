@@ -44,7 +44,26 @@ defmodule TbjToPocketWeb.Controller do
   end
 
   defp send_url_to_instapaper(id) do
-    url = "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"
+    url = "https://www.instapaper.com/api/1/bookmarks/add"
+
+    creds =
+      OAuther.credentials(
+        consumer_key: Application.fetch_env!(:tbj_to_pocket, :consumer_id),
+        consumer_secret: Application.fetch_env!(:tbj_to_pocket, :consumer_secret),
+        token: Application.fetch_env!(:tbj_to_pocket, :oauth_token),
+        token_secret: Application.fetch_env!(:tbj_to_pocket, :oauth_secret)
+      )
+
+    # might switch to sending content directly, and remove caching and showing
+    params =
+      OAuther.sign(
+        "post",
+        url,
+        [{"url", "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"}, {"resolve_final_url", 0}],
+        creds
+      )
+
+    {header, req_params} = OAuther.header(params)
 
     retry_func = fn _req, resp ->
       case resp do
@@ -53,11 +72,11 @@ defmodule TbjToPocketWeb.Controller do
       end
     end
 
-    Req.post("https://www.instapaper.com/api/add",
+    Req.post(url,
       retry: retry_func,
       receive_timeout: 30_000,
-      auth: {:basic, Application.fetch_env!(:tbj_to_pocket, :userpass)},
-      form: [url: url]
+      headers: [header],
+      form: req_params
     )
   end
 end
