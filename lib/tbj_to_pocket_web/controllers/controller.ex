@@ -54,7 +54,6 @@ defmodule TbjToPocketWeb.Controller do
         token_secret: Application.fetch_env!(:tbj_to_pocket, :oauth_secret)
       )
 
-    # might switch to sending content directly, and remove caching and showing
     params =
       OAuther.sign(
         "post",
