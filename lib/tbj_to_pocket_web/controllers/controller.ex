@@ -57,7 +57,7 @@ defmodule TbjToPocketWeb.Controller do
       retry: retry_func,
       receive_timeout: 30_000,
       auth: {:basic, Application.fetch_env!(:tbj_to_pocket, :userpass)},
-      json: %{url: url}
+      form: [url: url]
     )
   end
 end
