@@ -43,7 +43,7 @@ defmodule TbjToPocketWeb.Controller do
     end
   end
 
-  defp send_url_to_instapaper(id, binary) do
+  defp send_url_to_instapaper(_id, binary) do
     url = "https://www.instapaper.com/api/1/bookmarks/add"
 
     creds =
@@ -59,9 +59,8 @@ defmodule TbjToPocketWeb.Controller do
         "post",
         url,
         [
-          {"url", "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"},
           {"content", binary},
-          {"resolve_final_url", 0}
+          {"is_private_from_source", "tbj_to_pocket"}
         ],
         creds
       )
