@@ -23,4 +23,11 @@ defmodule TbjToPocketWeb.Auth do
 
   defp auth(["Bearer " <> token]),
     do: token == Application.fetch_env!(:tbj_to_pocket, :auth_token)
+
+  defp auth(["Basic " <> token]) do
+    case Base.decode64(token) do
+      {:ok, userpass} -> userpass == Application.fetch_env!(:tbj_to_pocket, :userpass)
+      _ -> false
+    end
+  end
 end
