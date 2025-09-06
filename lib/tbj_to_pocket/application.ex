@@ -9,7 +9,25 @@ defmodule TbjToPocket.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {Cachex, [:articles, [expiration: expiration(default: :timer.hours(36))]]},
+      {Cachex,
+       [
+         :articles,
+         [
+           hooks: [
+             hook(
+               module: Cachex.Limit.Scheduled,
+               args: {
+                 # setting cache max size
+                 100,
+                 # options for `Cachex.prune/3`
+                 [],
+                 # options for `Cachex.Limit.Scheduled`
+                 [frequency: 30000]
+               }
+             )
+           ]
+         ]
+       ]},
       TbjToPocketWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},
