@@ -2,10 +2,12 @@ defmodule TbjToPocketWeb.Controller do
   use TbjToPocketWeb, :controller
   require Logger
 
+  defp expire_ms, do: Application.fetch_env!(:tbj_to_pocket, :redis_expire_ms)
+
   def healthz(conn, _), do: send_resp(conn, 200, "ok")
 
   def show(conn, %{"id" => id}) do
-    case Cachex.get(:articles, id) do
+    case Redix.command(:redix, ["GET", id]) do
       {:ok, nil} ->
         send_resp(conn, 404, "not found")
 
@@ -20,7 +22,8 @@ defmodule TbjToPocketWeb.Controller do
   def new(conn, %{"data" => data}) do
     with {:ok, binary} <- File.read(data.path),
          id = Nanoid.generate(),
-         {:ok, true} <- Cachex.put(:articles, id, binary),
+         {:ok, _} <-
+           Redix.command(:redix, ["SET", id, binary, "PX", expire_ms()]),
          {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
@@ -33,7 +36,8 @@ defmodule TbjToPocketWeb.Controller do
   # handles webhooks where content is in the request body directly
   def new(conn, %{"html" => binary}) do
     with id = Nanoid.generate(),
-         {:ok, true} <- Cachex.put(:articles, id, binary),
+         {:ok, _} <-
+           Redix.command(:redix, ["SET", id, binary, "PX", expire_ms()]),
          {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else

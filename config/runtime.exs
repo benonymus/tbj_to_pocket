@@ -44,7 +44,11 @@ if config_env() == :prod do
     consumer_id: System.get_env("CONSUMER_ID"),
     consumer_secret: System.get_env("CONSUMER_SECRET"),
     oauth_token: System.get_env("OAUTH_TOKEN"),
-    oauth_secret: System.get_env("OAUTH_SECRET")
+    oauth_secret: System.get_env("OAUTH_SECRET"),
+    redis_expire_ms:
+      :timer.hours(String.to_integer(System.get_env("REDIS_EXPIRE_DAYS", "30")) * 24),
+    redis_url: System.fetch_env!("REDIS_URL"),
+    redis_ssl: true
 
   config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],

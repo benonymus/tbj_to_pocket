@@ -20,6 +20,11 @@ config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
   pubsub_server: TbjToPocket.PubSub,
   live_view: [signing_salt: "xuy9z2Li"]
 
+config :tbj_to_pocket,
+  redis_expire_ms: :timer.hours(24),
+  redis_url: "redis://127.0.0.1:6379",
+  redis_ssl: false
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
