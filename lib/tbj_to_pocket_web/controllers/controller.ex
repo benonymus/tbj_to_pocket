@@ -11,7 +11,9 @@ defmodule TbjToPocketWeb.Controller do
       {:ok, nil} ->
         send_resp(conn, 404, "not found")
 
-      {:ok, article} ->
+      {:ok, compressed_article} ->
+        article = :zlib.uncompress(compressed_article)
+
         conn
         |> put_resp_header("content-type", "text/html; charset=UTF-8")
         |> send_resp(:ok, article)
@@ -21,9 +23,10 @@ defmodule TbjToPocketWeb.Controller do
   # handles webhooks from file uploads eg.: https://github.com/gildas-lormeau/SingleFile
   def new(conn, %{"data" => data}) do
     with {:ok, binary} <- File.read(data.path),
+         compressed_binary = :zlib.compress(binary),
          id = Nanoid.generate(),
          {:ok, _} <-
-           Redix.command(:redix, ["SET", id, binary, "PX", expire_ms()]),
+           Redix.command(:redix, ["SET", id, compressed_binary, "PX", expire_ms()]),
          {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
@@ -35,9 +38,10 @@ defmodule TbjToPocketWeb.Controller do
 
   # handles webhooks where content is in the request body directly
   def new(conn, %{"html" => binary}) do
-    with id = Nanoid.generate(),
+    with compressed_binary = :zlib.compress(binary),
+         id = Nanoid.generate(),
          {:ok, _} <-
-           Redix.command(:redix, ["SET", id, binary, "PX", expire_ms()]),
+           Redix.command(:redix, ["SET", id, compressed_binary, "PX", expire_ms()]),
          {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
