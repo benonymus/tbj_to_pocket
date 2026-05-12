@@ -2,33 +2,13 @@ defmodule TbjToPocketWeb.Controller do
   use TbjToPocketWeb, :controller
   require Logger
 
-  defp expire_ms, do: Application.fetch_env!(:tbj_to_pocket, :redis_expire_ms)
-
   def healthz(conn, _), do: send_resp(conn, 200, "ok")
-
-  def show(conn, %{"id" => id}) do
-    case Redix.command(:redix, ["GET", id]) do
-      {:ok, nil} ->
-        send_resp(conn, 404, "not found")
-
-      {:ok, compressed_article} ->
-        article = :zlib.uncompress(compressed_article)
-
-        conn
-        |> put_resp_header("content-type", "text/html; charset=UTF-8")
-        |> send_resp(:ok, article)
-    end
-  end
 
   # handles webhooks from file uploads eg.: https://github.com/gildas-lormeau/SingleFile
   def new(conn, %{"data" => data}) do
-    with {:ok, binary} <- File.read(data.path),
-         compressed_binary = :zlib.compress(binary),
-         id = Nanoid.generate(),
-         {:ok, _} <-
-           Redix.command(:redix, ["SET", id, compressed_binary, "PX", expire_ms()]),
-         {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
-      send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
+    with {:ok, content} <- File.read(data.path),
+         {:ok, %{status: 200}} <- send_content_to_instapaper(content) do
+      send_resp(conn, :ok, Jason.encode!(%{success: true}))
     else
       error ->
         Logger.error("Failed to send url to Instapaper: #{inspect(error)}")
@@ -37,13 +17,9 @@ defmodule TbjToPocketWeb.Controller do
   end
 
   # handles webhooks where content is in the request body directly
-  def new(conn, %{"html" => binary}) do
-    with compressed_binary = :zlib.compress(binary),
-         id = Nanoid.generate(),
-         {:ok, _} <-
-           Redix.command(:redix, ["SET", id, compressed_binary, "PX", expire_ms()]),
-         {:ok, %{status: 200}} <- send_url_to_instapaper(id) do
-      send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
+  def new(conn, %{"html" => content}) do
+    with {:ok, %{status: 200}} <- send_content_to_instapaper(content) do
+      send_resp(conn, :ok, Jason.encode!(%{success: true}))
     else
       error ->
         Logger.error("Failed to send url to Instapaper: #{inspect(error)}")
@@ -51,7 +27,7 @@ defmodule TbjToPocketWeb.Controller do
     end
   end
 
-  defp send_url_to_instapaper(id) do
+  def send_content_to_instapaper(content) do
     url = "https://www.instapaper.com/api/1/bookmarks/add"
 
     creds =
@@ -66,7 +42,7 @@ defmodule TbjToPocketWeb.Controller do
       OAuther.sign(
         "post",
         url,
-        [{"url", "#{TbjToPocketWeb.Endpoint.url()}/articles/#{id}"}, {"resolve_final_url", 0}],
+        [{"is_private_from_source", "tbj_to_pocket"}, {"content", content}],
         creds
       )
 

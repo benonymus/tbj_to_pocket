@@ -39,9 +39,7 @@ defmodule TbjToPocket.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, ">= 0.0.0"},
       {:req, "~> 0.5.8"},
-      {:nanoid, "~> 2.1.0"},
       {:oauther, "~> 1.3"},
-      {:redix, "~> 1.1"},
       {:castore, ">= 0.0.0"}
     ]
   end

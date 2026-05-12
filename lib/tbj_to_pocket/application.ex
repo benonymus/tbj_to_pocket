@@ -7,24 +7,7 @@ defmodule TbjToPocket.Application do
 
   @impl true
   def start(_type, _args) do
-    redis_opts = [name: :redix]
-
-    redis_opts =
-      if Application.fetch_env!(:tbj_to_pocket, :redis_ssl) do
-        Keyword.merge(redis_opts,
-          ssl: true,
-          socket_opts: [
-            customize_hostname_check: [
-              match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
-            ]
-          ]
-        )
-      else
-        redis_opts
-      end
-
     children = [
-      {Redix, {Application.fetch_env!(:tbj_to_pocket, :redis_url), redis_opts}},
       TbjToPocketWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},
