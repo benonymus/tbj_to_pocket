@@ -32,13 +32,13 @@ defmodule TbjToPocket.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7.10"},
-      {:telemetry_metrics, "~> 0.6"},
+      {:phoenix, "~> 1.8.7"},
+      {:telemetry_metrics, "~> 1.1"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.1.1"},
+      {:dns_cluster, "~> 0.2.0"},
       {:bandit, ">= 0.0.0"},
-      {:req, "~> 0.5.8"},
+      {:req, "~> 0.5.17"},
       {:oauther, "~> 1.3"},
       {:castore, ">= 0.0.0"}
     ]
