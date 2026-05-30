@@ -2,7 +2,7 @@ defmodule TbjToPocket.ArticeWorker do
   alias BullMQ.Job
 
   def dispatch(article_id) do
-    BullMQ.Queue.add("articles", "process_article", %{article_id: article_id},
+    BullMQ.Queue.add("dispatch", "add_article", %{article_id: article_id},
       connection: :bullmq_redix,
       attempts: 10,
       remove_on_complete: true,
@@ -11,7 +11,7 @@ defmodule TbjToPocket.ArticeWorker do
     )
   end
 
-  def process(%Job{name: "process_article", data: %{"article_id" => article_id}}) do
+  def process(%Job{name: "add_article", data: %{"article_id" => article_id}}) do
     url = "https://www.instapaper.com/api/1/bookmarks/add"
 
     creds =
@@ -35,11 +35,14 @@ defmodule TbjToPocket.ArticeWorker do
 
     {header, req_params} = OAuther.header(params)
 
-    Req.post(url,
-      receive_timeout: 25_000,
-      headers: [header],
-      form: req_params
-    )
+    case Req.post(url,
+           receive_timeout: 25_000,
+           headers: [header],
+           form: req_params
+         ) do
+      {:ok, %{status: 200}} -> :ok
+      error -> {:error, inspect(error)}
+    end
   end
 
   def process(%Job{name: name}) do

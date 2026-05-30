@@ -22,8 +22,7 @@ defmodule TbjToPocket.Application do
       end
 
     children = [
-      {Redix,
-       {Application.fetch_env!(:tbj_to_pocket, :redis_url), [name: :redix] ++ ssl_opts}},
+      {Redix, {Application.fetch_env!(:tbj_to_pocket, :redis_url), [name: :redix] ++ ssl_opts}},
       {BullMQ.RedisConnection,
        [
          name: :bullmq_redix,
@@ -32,12 +31,9 @@ defmodule TbjToPocket.Application do
       TbjToPocketWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},
-      # Start a worker by calling: TbjToPocket.Worker.start_link(arg)
-      # {TbjToPocket.Worker, arg},
-      # Start to serve requests, typically the last entry
       TbjToPocketWeb.Endpoint,
       {BullMQ.Worker,
-       queue: "articles",
+       queue: "dispatch",
        connection: :bullmq_redix,
        processor: &TbjToPocket.ArticeWorker.process/1,
        concurrency: 1,
