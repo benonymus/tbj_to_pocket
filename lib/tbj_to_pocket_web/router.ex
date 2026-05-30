@@ -10,6 +10,10 @@ defmodule TbjToPocketWeb.Router do
     post "/articles", Controller, :new
   end
 
+  scope "/articles", TbjToPocketWeb do
+    get "/:id", Controller, :show
+  end
+
   scope "/", TbjToPocketWeb do
     get "/healthz", Controller, :healthz
   end
