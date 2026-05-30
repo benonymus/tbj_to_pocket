@@ -7,12 +7,9 @@ defmodule TbjToPocket.Application do
 
   @impl true
   def start(_type, _args) do
-    redis_opts = [name: :redix]
-    bullmq_redis_opts = [name: :bullmq_redix]
-
-    {redis_opts, bullmq_redis_opts} =
+    ssl_opts =
       if Application.fetch_env!(:tbj_to_pocket, :redis_ssl) do
-        ssl_config = [
+        [
           ssl: true,
           socket_opts: [
             customize_hostname_check: [
@@ -20,18 +17,18 @@ defmodule TbjToPocket.Application do
             ]
           ]
         ]
-
-        {Keyword.merge(redis_opts, ssl_config), Keyword.merge(bullmq_redis_opts, ssl_config)}
       else
-        {redis_opts, bullmq_redis_opts}
+        []
       end
 
     children = [
-      {Redix, {Application.fetch_env!(:tbj_to_pocket, :redis_url), redis_opts}},
+      {Redix,
+       {Application.fetch_env!(:tbj_to_pocket, :redis_url), [name: :redix] ++ ssl_opts}},
       {BullMQ.RedisConnection,
-       name: :bullmq_redix,
-       url: Application.fetch_env!(:tbj_to_pocket, :bullmq_redis_url),
-       redis_opts: bullmq_redis_opts},
+       [
+         name: :bullmq_redix,
+         url: Application.fetch_env!(:tbj_to_pocket, :bullmq_redis_url)
+       ] ++ ssl_opts},
       TbjToPocketWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},

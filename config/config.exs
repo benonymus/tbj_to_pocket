@@ -22,8 +22,8 @@ config :tbj_to_pocket, TbjToPocketWeb.Endpoint,
 
 config :tbj_to_pocket,
   redis_expire_ms: :timer.hours(24),
-  redis_url: "redis://127.0.0.1:6379/0",
-  bullmq_redis_url: "redis://127.0.0.1:6379/1",
+  redis_url: "redis://127.0.0.1:6379",
+  bullmq_redis_url: "redis://127.0.0.1:6379",
   redis_ssl: false
 
 # Configures Elixir's Logger
