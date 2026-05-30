@@ -3,7 +3,7 @@ defmodule TbjToPocket.ArticeWorker do
 
   def dispatch(article_id) do
     BullMQ.Queue.add("articles", "process_article", %{article_id: article_id},
-      connection: :my_redis,
+      connection: :bullmq_redix,
       attempts: 10,
       remove_on_complete: true,
       remove_on_fail: %{count: 10},
