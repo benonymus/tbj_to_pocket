@@ -37,6 +37,8 @@ defmodule TbjToPocket.Application do
        connection: :bullmq_redix,
        processor: &TbjToPocket.ArticeWorker.process/1,
        concurrency: 1,
+       drain_delay: 60,
+       stalled_interval: 300_000,
        on_completed: fn job, result ->
          Logger.info("Job #{job.id} completed: #{inspect(result)}")
        end,
