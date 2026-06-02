@@ -38,7 +38,7 @@ defmodule TbjToPocket.Application do
         connection: :bullmq_redix,
         processor: &TbjToPocket.ArticleWorker.process/1,
         concurrency: 1,
-        drain_delay: 60,
+        drain_delay: 300,
         stalled_interval: 300_000,
         remove_on_complete: true,
         remove_on_fail: %{count: 10},
