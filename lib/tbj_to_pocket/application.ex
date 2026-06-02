@@ -32,19 +32,23 @@ defmodule TbjToPocket.Application do
       {DNSCluster, query: Application.get_env(:tbj_to_pocket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TbjToPocket.PubSub},
       TbjToPocketWeb.Endpoint,
-      {BullMQ.Worker,
-       queue: "dispatch",
-       connection: :bullmq_redix,
-       processor: &TbjToPocket.ArticeWorker.process/1,
-       concurrency: 1,
-       drain_delay: 60,
-       stalled_interval: 300_000,
-       on_completed: fn job, result ->
-         Logger.info("Job #{job.id} completed: #{inspect(result)}")
-       end,
-       on_failed: fn job, reason ->
-         Logger.error("Job #{job.id} failed: #{reason}")
-       end}
+      {
+        BullMQ.Worker,
+        queue: "dispatch",
+        connection: :bullmq_redix,
+        processor: &TbjToPocket.ArticleWorker.process/1,
+        concurrency: 1,
+        drain_delay: 60,
+        stalled_interval: 300_000,
+        remove_on_complete: true,
+        remove_on_fail: %{count: 10},
+        on_completed: fn job, result ->
+          Logger.info("Job #{job.id} completed: #{inspect(result)}")
+        end,
+        on_failed: fn job, reason ->
+          Logger.error("Job #{job.id} failed: #{reason}")
+        end
+      }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

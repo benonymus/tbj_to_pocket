@@ -1,12 +1,10 @@
-defmodule TbjToPocket.ArticeWorker do
+defmodule TbjToPocket.ArticleWorker do
   alias BullMQ.Job
 
   def dispatch(article_id) do
     BullMQ.Queue.add("dispatch", "add_article", %{article_id: article_id},
       connection: :bullmq_redix,
       attempts: 10,
-      remove_on_complete: true,
-      remove_on_fail: %{count: 10},
       backoff: %{type: "exponential", delay: 2000}
     )
   end

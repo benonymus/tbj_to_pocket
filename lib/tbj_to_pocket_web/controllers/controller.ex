@@ -27,7 +27,7 @@ defmodule TbjToPocketWeb.Controller do
          id = Nanoid.generate(),
          {:ok, _} <-
            Redix.command(:redix, ["SET", article_key(id), compressed_binary, "PX", expire_ms()]),
-         {:ok, _job} <- TbjToPocket.ArticeWorker.dispatch(id) do
+         {:ok, _job} <- TbjToPocket.ArticleWorker.dispatch(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
       error ->
@@ -42,7 +42,7 @@ defmodule TbjToPocketWeb.Controller do
          id = Nanoid.generate(),
          {:ok, _} <-
            Redix.command(:redix, ["SET", article_key(id), compressed_binary, "PX", expire_ms()]),
-         {:ok, _job} <- TbjToPocket.ArticeWorker.dispatch(id) do
+         {:ok, _job} <- TbjToPocket.ArticleWorker.dispatch(id) do
       send_resp(conn, :ok, Jason.encode!(%{success: true, id: id}))
     else
       error ->
